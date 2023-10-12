@@ -2,6 +2,8 @@ package com.house.rooms.api;
 
 import com.house.rooms.data.Room;
 import com.house.rooms.data.RoomRepository;
+import com.house.rooms.data.Student;
+import com.house.rooms.data.StudentRepository;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -10,9 +12,11 @@ import java.util.List;
 @RequestMapping("rooms")
 public class RoomEndpoint {
     private final RoomRepository roomRepository;
+    private final StudentRepository studentRepository;
 
-    public RoomEndpoint(RoomRepository roomRepository) {
+    public RoomEndpoint(RoomRepository roomRepository, StudentRepository studentRepository) {
         this.roomRepository = roomRepository;
+        this.studentRepository = studentRepository;
     }
 
     @GetMapping
@@ -39,5 +43,27 @@ public class RoomEndpoint {
     @DeleteMapping("/{id}")
     void delete(@PathVariable long id) {
         roomRepository.deleteById(id);
+    }
+
+    @PostMapping("/{roomId}/students/{studentId}")
+    Room addStudentToRoom  (
+            @PathVariable long roomId,
+            @PathVariable long studentId
+    ) throws RoomNotFoundException, StudentNotFoundException {
+        // Retrieve the room and student entities from the repository
+        Room room = roomRepository.findById(roomId)
+                .orElseThrow(RoomNotFoundException::new);
+        Student student = studentRepository.findById(studentId)
+                .orElseThrow(StudentNotFoundException::new);
+
+        // Add the student to the room
+        room.getStudents().add(student);
+        student.setRoom(room);
+
+        // Save the updated room and student entities
+        roomRepository.save(room);
+        studentRepository.save(student);
+
+        return room;
     }
 }
