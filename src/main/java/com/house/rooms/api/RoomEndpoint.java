@@ -56,14 +56,30 @@ public class RoomEndpoint {
         Student student = studentRepository.findById(studentId)
                 .orElseThrow(StudentNotFoundException::new);
 
-        // Add the student to the room
-        room.getStudents().add(student);
-        student.setRoom(room);
+        // Check if the room already has three students
 
-        // Save the updated room and student entities
-        roomRepository.save(room);
-        studentRepository.save(student);
+        if (room.getStudents().size() >= 3) {
+            throw new MaximumStudentsReachedException();
+        }
 
-        return room;
+        // Check if the room is empty or if the student's gender matches the room's gender
+        if (room.getStudents().isEmpty() || room.getStudents().get(0).getGender() == student.getGender()) {
+            // Check if the room is empty or if the student's house matches the house of students in the room
+            if (room.getStudents().isEmpty() || room.getStudents().get(0).getHouse() == student.getHouse()) {
+                // Add the student to the room
+                room.getStudents().add(student);
+                student.setRoom(room);
+
+                // Save the updated room and student entities
+                roomRepository.save(room);
+                studentRepository.save(student);
+
+                return room;
+            } else {
+                throw new InvalidStudentGenderException();
+            }
+        } else {
+            throw new InvalidStudentGenderException();
+        }
     }
 }

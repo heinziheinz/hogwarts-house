@@ -12,12 +12,34 @@ public class Student {
     @GeneratedValue
     private long id;
     private String name;
+    private Gender gender; // Use the Gender enum
+    private House house;
 
     @ManyToOne // Defines the many-to-one relationship
     @JsonIgnore // Add @JsonIgnore to prevent infinite loop
     private Room room; // The room associated with the student
 
     // Constructors, getters, and setters
+
+    // Getter for gender
+    public House getHouse() {
+        return house;
+    }
+
+    // Setter for house
+    public void setHouse(House house) {
+        this.house = house;
+    }
+
+    public Gender getGender() {
+        return gender;
+    }
+
+    // Setter for gender
+    public void setGender(Gender gender) {
+        this.gender = gender;
+    }
+
 
     public Room getRoom() {
         return room;
